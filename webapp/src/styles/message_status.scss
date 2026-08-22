@@ -16,6 +16,11 @@
         min-height: 0;
     }
 
+    // Channel Reply and other custom post types render a quote block above the body.
+    .quoted-reply-post + .message-status-ticks-attachment {
+        margin-top: 0.1rem;
+    }
+
     .message-status-ticks {
         display: inline-flex;
         align-items: center;

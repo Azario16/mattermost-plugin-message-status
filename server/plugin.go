@@ -28,12 +28,28 @@ func (p *Plugin) OnActivate() error {
 	return nil
 }
 
+func isUserContentPostType(postType string) bool {
+	if postType == "" || postType == model.PostTypeDefault {
+		return true
+	}
+
+	if strings.HasPrefix(postType, "system_") {
+		return false
+	}
+
+	if strings.HasPrefix(postType, "custom_") {
+		return true
+	}
+
+	return false
+}
+
 func (p *Plugin) MessageHasBeenPosted(_ *plugin.Context, post *model.Post) {
 	if post == nil || post.DeleteAt > 0 {
 		return
 	}
 
-	if post.Type != "" && post.Type != model.PostTypeDefault {
+	if !isUserContentPostType(post.Type) {
 		return
 	}
 

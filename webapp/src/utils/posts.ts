@@ -61,6 +61,23 @@ export function isPendingPost(post: Post): boolean {
     return Boolean(post.pending_post_id && post.id === post.pending_post_id);
 }
 
+// Mattermost plugins (e.g. Channel Reply) use custom_* post types for user-authored content.
+export function isUserContentPostType(type?: string): boolean {
+    if (!type) {
+        return true;
+    }
+
+    if (type.startsWith('system_')) {
+        return false;
+    }
+
+    if (type.startsWith('custom_')) {
+        return true;
+    }
+
+    return false;
+}
+
 export function isEligiblePost(post: Post | undefined): post is Post {
     if (!post) {
         return false;
@@ -70,11 +87,7 @@ export function isEligiblePost(post: Post | undefined): post is Post {
         return false;
     }
 
-    if (post.type?.startsWith('system_')) {
-        return false;
-    }
-
-    if (post.type) {
+    if (!isUserContentPostType(post.type)) {
         return false;
     }
 
