@@ -2,11 +2,9 @@ import React from 'react';
 import type {Store} from 'redux';
 
 import type {GlobalState} from '@mattermost/types/store';
-import type {Post} from '@mattermost/types/posts';
 
 import manifest from './manifest';
 import reducer from './reducers';
-import MessageStatusAttachment from './components/MessageStatusAttachment';
 import MessageStatusPortals from './components/MessageStatusPortals';
 import MessageStatusStyles from './components/MessageStatusStyles';
 import PostReadTracker from './components/PostReadTracker';
@@ -19,7 +17,6 @@ import {getOwnEligiblePostIds} from './utils/posts';
 type PluginRegistry = {
     registerReducer: (reducer: typeof reducer) => void;
     registerRootComponent: (component: React.ComponentType) => string;
-    registerPostMessageAttachmentComponent: (component: React.ComponentType<{postId?: string; post?: Post; store?: Store<GlobalState>}>) => string;
     registerWebSocketEventHandler: (event: string, handler: (msg: {data?: StatusUpdatePayload}) => void) => void;
     registerReconnectHandler: (handler: () => void) => void;
     registerTranslations: (getTranslationsForLocale: (locale: string) => Record<string, string>) => void;
@@ -45,14 +42,6 @@ export default class Plugin {
         registry.registerRootComponent(MessageStatusStyles);
         registry.registerRootComponent(() => <PostReadTracker store={store}/>);
         registry.registerRootComponent(() => <MessageStatusPortals store={store}/>);
-
-        const Attachment = (props: {postId?: string; post?: Post}) => (
-            <MessageStatusAttachment
-                {...props}
-                store={store}
-            />
-        );
-        registry.registerPostMessageAttachmentComponent(Attachment);
 
         registry.registerWebSocketEventHandler(STATUS_UPDATED_EVENT, (msg) => {
             applyStatusUpdate(store, extractStatusPayload(msg));

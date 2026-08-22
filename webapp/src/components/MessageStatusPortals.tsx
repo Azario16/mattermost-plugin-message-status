@@ -6,13 +6,7 @@ import type {Store} from 'redux';
 import type {GlobalState} from '@mattermost/types/store';
 
 import MessageStatusAttachment from './MessageStatusAttachment';
-import {
-    getPostElement,
-    getVisiblePosts,
-    isCustomPluginPost,
-    isEligiblePost,
-    isOwnPost,
-} from '../utils/posts';
+import {getOwnEligiblePostIds, getPostTickAnchor} from '../utils/posts';
 
 type Props = {
     store: Store<GlobalState>;
@@ -21,14 +15,13 @@ type Props = {
 const portalHosts = new Map<string, HTMLElement>();
 
 function getOrCreatePortalHost(postId: string): HTMLElement | null {
-    const postElement = getPostElement(postId);
-    const body = postElement?.querySelector('.post__body');
-    if (!body) {
+    const anchor = getPostTickAnchor(postId);
+    if (!anchor) {
         return null;
     }
 
     const cached = portalHosts.get(postId);
-    if (cached?.isConnected && body.contains(cached)) {
+    if (cached?.isConnected && anchor.contains(cached)) {
         return cached;
     }
 
@@ -39,7 +32,7 @@ function getOrCreatePortalHost(postId: string): HTMLElement | null {
     const host = document.createElement('div');
     host.className = 'message-status-ticks-portal-host';
     host.dataset.postId = postId;
-    body.appendChild(host);
+    anchor.appendChild(host);
     portalHosts.set(postId, host);
     return host;
 }
@@ -59,26 +52,14 @@ function syncPortalHosts(postIds: string[]): boolean {
     return changed;
 }
 
-function selectCustomOwnPostIds(state: GlobalState): string[] {
-    const currentUserId = state.entities.users.currentUserId;
-    if (!currentUserId) {
-        return [];
-    }
-
-    return getVisiblePosts(state)
-        .filter((post) => isEligiblePost(post) && isOwnPost(post, currentUserId))
-        .filter((post) => isCustomPluginPost(post))
-        .map((post) => post.id);
-}
-
 const MessageStatusPortals: React.FC<Props> = ({store}) => {
-    const customOwnPostIds = useSelector(selectCustomOwnPostIds);
-    const customOwnPostIdsKey = customOwnPostIds.join(',');
+    const ownPostIds = useSelector(getOwnEligiblePostIds);
+    const ownPostIdsKey = ownPostIds.join(',');
     const [, bumpRender] = useReducer((value: number) => value + 1, 0);
 
     useEffect(() => {
         const refresh = () => {
-            if (syncPortalHosts(customOwnPostIds)) {
+            if (syncPortalHosts(ownPostIds)) {
                 bumpRender();
             }
         };
@@ -92,11 +73,11 @@ const MessageStatusPortals: React.FC<Props> = ({store}) => {
             window.clearTimeout(retryTimer);
             window.clearTimeout(retryTimer2);
         };
-    }, [customOwnPostIdsKey]);
+    }, [ownPostIdsKey]);
 
     return (
         <>
-            {customOwnPostIds.map((postId) => {
+            {ownPostIds.map((postId) => {
                 const host = portalHosts.get(postId);
                 if (!host?.isConnected) {
                     return null;

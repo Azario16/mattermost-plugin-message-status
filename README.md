@@ -34,7 +34,7 @@ make dist
 Creates a **Linux-only** bundle (~24 MB) using a Go bundler that writes a Mattermost-compatible tar structure:
 
 ```
-dist/com.github.mattermost-message-status-1.0.1.tar.gz
+dist/com.github.mattermost-message-status-1.0.2.tar.gz
 ```
 
 For all platforms (linux + darwin + windows, ~61 MB — may require raising `FileSettings.MaxFileSize`):
@@ -57,13 +57,13 @@ make clean       # remove build artifacts
 
 1. **System Console → Plugins → Plugin Management**
 2. Enable **Enable Plugins** and **Enable Uploads**
-3. Upload `dist/com.github.mattermost-message-status-1.0.1.tar.gz`
+3. Upload `dist/com.github.mattermost-message-status-1.0.2.tar.gz`
 4. Enable **Message Status**
 
 ### mmctl
 
 ```bash
-mmctl plugin upload dist/com.github.mattermost-message-status-1.0.1.tar.gz
+mmctl plugin upload dist/com.github.mattermost-message-status-1.0.2.tar.gz
 mmctl plugin enable com.github.mattermost-message-status
 ```
 
@@ -73,7 +73,7 @@ Reload the Mattermost web client after installation (**Ctrl+F5**).
 
 ### Webapp
 
-- `MessageStatusAttachment` — registered via `registerPostMessageAttachmentComponent`, renders SVG ticks to the right of message text
+- `MessageStatusPortals` — appends tick UI into each own post body (text, images, custom post types) at the bottom-right
 - `PostReadTracker` — uses `IntersectionObserver` to call the server when another user's post becomes visible
 - Redux store — caches per-post status for instant UI updates
 - WebSocket handler — listens for `status_updated` events from the server plugin

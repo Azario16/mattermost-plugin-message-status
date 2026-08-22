@@ -152,6 +152,16 @@ export function getPostElement(postId: string): HTMLElement | null {
         document.querySelector(`[data-post-id="${postId}"]`);
 }
 
+export function getPostTickAnchor(postId: string): HTMLElement | null {
+    const postElement = getPostElement(postId);
+    if (!postElement) {
+        return null;
+    }
+
+    return postElement.querySelector('.post__body') ||
+        postElement.querySelector('.post__content');
+}
+
 export function getPostIdsInThread(state: {entities: {posts: {postsInThread: Record<string, string[]>}}}, rootId: string): string[] {
     return state.entities.posts.postsInThread[rootId] || [];
 }
