@@ -48,7 +48,7 @@ make dist
 Creates a **Linux-only** bundle (~24 MB) using a Go bundler that writes a Mattermost-compatible tar structure:
 
 ```
-dist/com.github.mattermost-message-status-1.0.3.tar.gz
+dist/com.github.mattermost-message-status-1.0.4.tar.gz
 ```
 
 For all platforms (linux + darwin + windows, ~61 MB — may require raising `FileSettings.MaxFileSize`):
@@ -71,13 +71,13 @@ make clean       # remove build artifacts
 
 1. **System Console → Plugins → Plugin Management**
 2. Enable **Enable Plugins** and **Enable Uploads**
-3. Upload `dist/com.github.mattermost-message-status-1.0.3.tar.gz`
+3. Upload `dist/com.github.mattermost-message-status-1.0.4.tar.gz`
 4. Enable **Message Status**
 
 ### mmctl
 
 ```bash
-mmctl plugin upload dist/com.github.mattermost-message-status-1.0.3.tar.gz
+mmctl plugin upload dist/com.github.mattermost-message-status-1.0.4.tar.gz
 mmctl plugin enable com.github.mattermost-message-status
 ```
 

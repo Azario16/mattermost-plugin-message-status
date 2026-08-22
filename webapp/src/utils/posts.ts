@@ -148,6 +148,8 @@ export function getUserDisplayName(state: {entities: {users: {profiles: Record<s
 export function getPostElement(postId: string): HTMLElement | null {
     return document.getElementById(`post_${postId}`) ||
         document.getElementById(`rhsPost_${postId}`) ||
+        document.querySelector(`.ThreadViewer [data-postid="${postId}"]`) ||
+        document.querySelector(`.ThreadViewer [data-post-id="${postId}"]`) ||
         document.querySelector(`[data-postid="${postId}"]`) ||
         document.querySelector(`[data-post-id="${postId}"]`);
 }
@@ -164,6 +166,14 @@ export function getPostTickAnchor(postId: string): HTMLElement | null {
 
 export function getPostIdsInThread(state: {entities: {posts: {postsInThread: Record<string, string[]>}}}, rootId: string): string[] {
     return state.entities.posts.postsInThread[rootId] || [];
+}
+
+export function getThreadPostIds(state: ExtendedGlobalState, rootId: string): string[] {
+    const postIds = [rootId];
+    getPostIdsInThread(state, rootId).forEach((replyId) => {
+        postIds.push(replyId);
+    });
+    return postIds;
 }
 
 export function getVisiblePostIds(state: ExtendedGlobalState): string[] {

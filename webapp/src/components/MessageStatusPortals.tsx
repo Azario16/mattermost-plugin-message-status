@@ -13,6 +13,7 @@ type Props = {
 };
 
 const portalHosts = new Map<string, HTMLElement>();
+const PORTAL_RETRY_MS = [250, 1000, 3000, 5000];
 
 function getOrCreatePortalHost(postId: string): HTMLElement | null {
     const anchor = getPostTickAnchor(postId);
@@ -41,15 +42,29 @@ function syncPortalHosts(postIds: string[]): boolean {
     let changed = false;
 
     postIds.forEach((postId) => {
-        const wasConnected = portalHosts.get(postId)?.isConnected ?? false;
-        getOrCreatePortalHost(postId);
-        const isConnected = portalHosts.get(postId)?.isConnected ?? false;
-        if (isConnected && !wasConnected) {
+        const previousHost = portalHosts.get(postId);
+        const wasConnected = previousHost?.isConnected ?? false;
+        const host = getOrCreatePortalHost(postId);
+        const isConnected = host?.isConnected ?? false;
+
+        if (isConnected && (!wasConnected || host !== previousHost)) {
             changed = true;
         }
     });
 
     return changed;
+}
+
+function hasMissingPortalHosts(postIds: string[]): boolean {
+    return postIds.some((postId) => {
+        const anchor = getPostTickAnchor(postId);
+        if (!anchor) {
+            return false;
+        }
+
+        const host = portalHosts.get(postId);
+        return !host?.isConnected || !anchor.contains(host);
+    });
 }
 
 const MessageStatusPortals: React.FC<Props> = ({store}) => {
@@ -66,12 +81,21 @@ const MessageStatusPortals: React.FC<Props> = ({store}) => {
 
         refresh();
 
-        const retryTimer = window.setTimeout(refresh, 250);
-        const retryTimer2 = window.setTimeout(refresh, 1000);
+        const retryTimers = PORTAL_RETRY_MS.map((delay) => window.setTimeout(refresh, delay));
+
+        const resync = () => {
+            if (hasMissingPortalHosts(ownPostIds)) {
+                refresh();
+            }
+        };
+
+        window.addEventListener('scroll', resync, true);
+        window.addEventListener('resize', resync);
 
         return () => {
-            window.clearTimeout(retryTimer);
-            window.clearTimeout(retryTimer2);
+            retryTimers.forEach((timerId) => window.clearTimeout(timerId));
+            window.removeEventListener('scroll', resync, true);
+            window.removeEventListener('resize', resync);
         };
     }, [ownPostIdsKey]);
 

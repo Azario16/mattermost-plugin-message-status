@@ -12,10 +12,10 @@ import {
     getPostElement,
     getReadablePosts,
     getSelectedThreadRootId,
+    getThreadPostIds,
     getVisiblePosts,
     isEligiblePost,
     isOwnPost,
-    isThreadReply,
     shouldForceReadPost,
 } from '../utils/posts';
 import {isElementVisible} from '../utils/visibility';
@@ -121,7 +121,7 @@ const PostReadTracker: React.FC<Props> = ({store}) => {
         const state = store.getState() as ExtendedGlobalState;
         const openThreadRootId = getSelectedThreadRootId(state);
         const forceRead = shouldForceReadPost(post, postChannel, openThreadRootId);
-        const requiresVisibility = !forceRead || isThreadReply(post);
+        const requiresVisibility = !forceRead;
 
         if (requiresVisibility) {
             const element = getPostElement(postId) ||
@@ -168,6 +168,49 @@ const PostReadTracker: React.FC<Props> = ({store}) => {
             void hydratePostStatuses(store, ownPostIds);
         }
     }, [ownPostIds.join(','), scopeKey, store]);
+
+    useEffect(() => {
+        if (!currentUserId || !selectedThreadRootId) {
+            return undefined;
+        }
+
+        const markOpenThreadPosts = () => {
+            const state = store.getState() as ExtendedGlobalState;
+            getThreadPostIds(state, selectedThreadRootId).forEach((postId) => {
+                const post = state.entities.posts.posts[postId];
+                if (!isEligiblePost(post) || isOwnPost(post, currentUserId)) {
+                    return;
+                }
+
+                const postChannel = state.entities.channels.channels[post.channel_id];
+                tryMarkPostRead(postId, postChannel);
+            });
+        };
+
+        markOpenThreadPosts();
+        const retryTimer = window.setTimeout(markOpenThreadPosts, 500);
+        const retryTimer2 = window.setTimeout(markOpenThreadPosts, 2000);
+
+        return () => {
+            window.clearTimeout(retryTimer);
+            window.clearTimeout(retryTimer2);
+        };
+    }, [currentUserId, selectedThreadRootId, store, tryMarkPostRead]);
+
+    useEffect(() => {
+        if (ownPostIds.length === 0) {
+            return undefined;
+        }
+
+        const refreshOwnStatuses = () => {
+            void hydratePostStatuses(store, ownPostIds);
+        };
+
+        window.addEventListener('focus', refreshOwnStatuses);
+        return () => {
+            window.removeEventListener('focus', refreshOwnStatuses);
+        };
+    }, [ownPostIds.join(','), store]);
 
     useEffect(() => {
         if (!currentUserId) {
@@ -223,10 +266,12 @@ const PostReadTracker: React.FC<Props> = ({store}) => {
         observePosts();
         const retryTimer = window.setTimeout(observePosts, 250);
         const retryTimer2 = window.setTimeout(observePosts, 1000);
+        const retryTimer3 = window.setTimeout(observePosts, 3000);
 
         return () => {
             window.clearTimeout(retryTimer);
             window.clearTimeout(retryTimer2);
+            window.clearTimeout(retryTimer3);
             observerRef.current?.disconnect();
         };
     }, [currentUserId, readablePosts, selectedThreadRootId, store, tryMarkPostRead]);
