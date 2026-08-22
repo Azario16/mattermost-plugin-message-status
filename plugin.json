@@ -2,7 +2,7 @@
     "id": "com.github.mattermost-message-status",
     "name": "Message Status",
     "description": "Shows delivery and read receipts (checkmarks) on your messages, similar to WhatsApp and Telegram.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "min_server_version": "9.0.0",
     "server": {
         "executables": {
