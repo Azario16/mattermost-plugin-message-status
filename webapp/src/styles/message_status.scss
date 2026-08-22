@@ -1,24 +1,22 @@
 .message-status-plugin-active {
-    .post:not(.post--system) {
-        .post__body {
-            position: relative;
-        }
+    .post:not(.post--system) .post__body {
+        position: relative;
     }
 
-    .message-status-ticks-attachment {
-        display: flex;
-        justify-content: flex-end;
+    // Ticks are taken out of the flow so they never change post height.
+    .message-status-ticks-attachment,
+    .message-status-ticks-portal-host {
+        position: absolute;
+        right: 2px;
+        bottom: 2px;
+        display: inline-flex;
         align-items: center;
-        margin-top: -1.35rem;
-        margin-bottom: 0.15rem;
-        padding-right: 2px;
+        line-height: 1;
         pointer-events: auto;
-        min-height: 0;
     }
 
-    // Channel Reply and other custom post types render a quote block above the body.
-    .quoted-reply-post + .message-status-ticks-attachment {
-        margin-top: 0.1rem;
+    .message-status-ticks-portal-host .message-status-ticks-attachment {
+        position: static;
     }
 
     .message-status-ticks {

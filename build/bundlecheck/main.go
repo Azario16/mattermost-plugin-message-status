@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	bundlePath := "dist/com.github.mattermost-message-status-1.0.0.tar.gz"
+	bundlePath := "dist/com.github.mattermost-message-status-1.0.1.tar.gz"
 	if len(os.Args) > 1 {
 		bundlePath = os.Args[1]
 	}

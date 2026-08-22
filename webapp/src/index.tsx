@@ -7,6 +7,7 @@ import type {Post} from '@mattermost/types/posts';
 import manifest from './manifest';
 import reducer from './reducers';
 import MessageStatusAttachment from './components/MessageStatusAttachment';
+import MessageStatusPortals from './components/MessageStatusPortals';
 import MessageStatusStyles from './components/MessageStatusStyles';
 import PostReadTracker from './components/PostReadTracker';
 import {applyStatusUpdate, hydratePostStatuses, setOptimisticDelivered} from './actions/status';
@@ -43,6 +44,7 @@ export default class Plugin {
         registry.registerTranslations(getTranslationsForLocale);
         registry.registerRootComponent(MessageStatusStyles);
         registry.registerRootComponent(() => <PostReadTracker store={store}/>);
+        registry.registerRootComponent(() => <MessageStatusPortals store={store}/>);
 
         const Attachment = (props: {postId?: string; post?: Post}) => (
             <MessageStatusAttachment

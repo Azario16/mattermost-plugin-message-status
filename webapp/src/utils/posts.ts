@@ -78,6 +78,10 @@ export function isUserContentPostType(type?: string): boolean {
     return false;
 }
 
+export function isCustomPluginPost(post: {type?: string}): boolean {
+    return Boolean(post.type?.startsWith('custom_')) && isUserContentPostType(post.type);
+}
+
 export function isEligiblePost(post: Post | undefined): post is Post {
     if (!post) {
         return false;
