@@ -4,6 +4,20 @@ WhatsApp/Telegram-style delivery and read receipts for your own messages: one gr
 
 > **Disclaimer:** This plugin was created with AI assistance (Cursor). It is provided as-is, without warranty. **Use at your own discretion** — review the code and test in your environment before production use.
 
+## Screenshots
+
+Read receipts update in real time — green double ticks (✓✓) when the recipient opens your message in the web client.
+
+![Read receipts in action](images/read-receipts.png)
+
+Gray tick (✓) = **Delivered**. Green ticks (✓✓) = **Read**. Status is shown only on your own messages.
+
+![Delivered vs read](images/delivered-vs-read.png)
+
+Hover a tick to see who read your message.
+
+![Read-by tooltip](images/read-by-tooltip.png)
+
 ## Features
 
 - **Delivered (✓)** — gray tick (`#9CA3AF`) when the message is persisted and available to recipients
@@ -92,6 +106,7 @@ Reload the Mattermost web client after installation (**Ctrl+F5**).
 ```
 ├── plugin.json
 ├── Makefile
+├── images/           # README screenshots
 ├── server/           # Go plugin (KV + API + WebSocket)
 │   ├── main.go
 │   ├── plugin.go
