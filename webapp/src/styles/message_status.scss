@@ -1,0 +1,40 @@
+.message-status-plugin-active {
+    .post:not(.post--system) {
+        .post__body {
+            position: relative;
+        }
+    }
+
+    .message-status-ticks-attachment {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: -1.35rem;
+        margin-bottom: 0.15rem;
+        padding-right: 2px;
+        pointer-events: auto;
+        min-height: 0;
+    }
+
+    .message-status-ticks {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        line-height: 1;
+        cursor: default;
+        user-select: none;
+
+        &--delivered {
+            color: #9CA3AF;
+        }
+
+        &--read {
+            color: #22C55E;
+        }
+
+        &__icon {
+            display: block;
+            overflow: visible;
+        }
+    }
+}
